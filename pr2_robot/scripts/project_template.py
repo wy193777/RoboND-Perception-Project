@@ -55,7 +55,7 @@ def send_to_yaml(yaml_filename, dict_list):
 
 
 # Exercise 1 Tabletop Segmentation
-def segmentation(Cloud):
+def segmentation(cloud):
     # TODO: Statistical Outlier Filtering
     fil = cloud.make_statistical_outlier_filter()
     fil.set_mean_k(20)
