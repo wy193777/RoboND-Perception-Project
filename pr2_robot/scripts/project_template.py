@@ -56,54 +56,46 @@ def send_to_yaml(yaml_filename, dict_list):
 
 # Exercise 1 Tabletop Segmentation
 def segmentation(cloud):
-    # TODO: Statistical Outlier Filtering
+    # Statistical Outlier Filtering
     fil = cloud.make_statistical_outlier_filter()
     fil.set_mean_k(20)
     fil.set_std_dev_mul_thresh(0.3)
     filtered_cloud = fil.filter()
-    # TODO: Voxel Grid Downsampling
+
+    # Voxel Grid Downsampling
     vox = filtered_cloud.make_voxel_grid_filter()
     LEAF_SIZE = 0.005
     vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
     cloud_filtered = vox.filter()
-    # TODO: PassThrough Filter
-    passthrough = cloud_filtered.make_passthrough_filter()
-    # Assign axis and range to the passthrough filter object.
-    filter_axis = 'z'
-    passthrough.set_filter_field_name(filter_axis)
-    axis_min = 0.6
-    axis_max = 1.1
-    passthrough.set_filter_limits(axis_min, axis_max)
 
-    cloud_passthrough = passthrough.filter()
+    filter_parameters = [
+        ('z', 0.6, 1.1),
+        ('y', -0.5, 0.5),
+        ('x', 0.3, 1.0),
+    ]
+    cloud_passthrough = None
+    for params in filter_parameters:
+        # PassThrough Filter
+        passthrough = cloud_filtered.make_passthrough_filter()
+        # Assign axis and range to the passthrough filter object.
+        filter_axis = 'z'
+        passthrough.set_filter_field_name(params[0])
+        axis_min = 0.6
+        axis_max = 1.1
+        passthrough.set_filter_limits(axis_min, axis_max)
 
-    # Create a PassThrough filter object.
-    passthrough = cloud_passthrough.make_passthrough_filter()
+        cloud_passthrough = passthrough.filter()
 
-    # Assign axis and range to the passthrough filter object.
-    filter_axis = 'y'
-    passthrough.set_filter_field_name(filter_axis)
-    axis_min = -0.5
-    axis_max = 0.5
-    passthrough.set_filter_limits(axis_min, axis_max)
-
-    # Finally use the filter function to obtain the resultant point cloud. 
-    cloud_passthrough = passthrough.filter()
-
-    # TODO: RANSAC Plane Segmentation
+    # RANSAC Plane Segmentation
     # Create the segmentation object
     seg = cloud_passthrough.make_segmenter()
-
     # Set the model you wish to fit
     seg.set_model_type(pcl.SACMODEL_PLANE)
     seg.set_method_type(pcl.SAC_RANSAC)
-
     # Max distance for a point to be considered fitting the model
-    # Experiment with different values for max_distance
-    # for segmenting the table
     max_distance = 0.01
     seg.set_distance_threshold(max_distance)
-    # TODO: Extract inliers and outliers
+    # Extract inliers and outliers
     inliers, coefficients = seg.segment()
     table = cloud_filtered.extract(inliers, negative=False)
     objects = cloud_filtered.extract(inliers, negative=True)
@@ -130,7 +122,6 @@ def clustering(objects):
     # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
     # Assign a color corresponding to each segmented object in scene
     cluster_color = get_color_list(len(cluster_indices))
-
     color_cluster_point_list = []
 
     for j, indices in enumerate(cluster_indices):
@@ -227,7 +218,7 @@ def pr2_mover(object_list):
 
     # TODO: Initialize variables
     dict_list = []
-    centroids = []
+    # centroids = []
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
     dropbox_param = rospy.get_param('/dropbox')
@@ -267,7 +258,6 @@ def pr2_mover(object_list):
                 points_arr = ros_to_pcl(detected_object.cloud).to_array()
                 #centroids.append(np.mean(points_arr, axis=0)[:3])
                 pick_pose_np = np.mean(points_arr, axis=0)[:3]
-                #pick_pose.position = [np.asscalar(pick_pose_np[0]), np.asscalar(pick_pose_np[1]), np.asscalar(pick_pose_np[2])]
                 pick_pose.position.x = np.asscalar(pick_pose_np[0])
                 pick_pose.position.y = np.asscalar(pick_pose_np[1])
                 pick_pose.position.z = np.asscalar(pick_pose_np[2])
