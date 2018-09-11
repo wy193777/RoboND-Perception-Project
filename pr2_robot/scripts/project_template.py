@@ -69,26 +69,23 @@ def segmentation(cloud):
     cloud_filtered = vox.filter()
 
     filter_parameters = [
-        ('z', 0.6, 1.1),
+        ('z', 0.6, 1.3),
         ('y', -0.5, 0.5),
-        ('x', 0.3, 1.0),
+        #('x', 0.3, 1.0),
     ]
-    cloud_passthrough = None
+    passthrough = None
     for params in filter_parameters:
         # PassThrough Filter
         passthrough = cloud_filtered.make_passthrough_filter()
         # Assign axis and range to the passthrough filter object.
-        filter_axis = 'z'
         passthrough.set_filter_field_name(params[0])
-        axis_min = 0.6
-        axis_max = 1.1
-        passthrough.set_filter_limits(axis_min, axis_max)
+        passthrough.set_filter_limits(params[1], params[2])
 
-        cloud_passthrough = passthrough.filter()
+        cloud_filtered = passthrough.filter()
 
     # RANSAC Plane Segmentation
     # Create the segmentation object
-    seg = cloud_passthrough.make_segmenter()
+    seg = cloud_filtered.make_segmenter()
     # Set the model you wish to fit
     seg.set_model_type(pcl.SACMODEL_PLANE)
     seg.set_method_type(pcl.SAC_RANSAC)
@@ -112,9 +109,9 @@ def clustering(objects):
     # as well as minimum and maximum cluster size (in points)
     # NOTE: These are poor choices of clustering parameters
     # Your task is to experiment and find values that work for segmenting objects.
-    ec.set_ClusterTolerance(0.001)
-    ec.set_MinClusterSize(10)
-    ec.set_MaxClusterSize(250)
+    ec.set_ClusterTolerance(0.03)
+    ec.set_MinClusterSize(20)
+    ec.set_MaxClusterSize(3000)
     # Search the k-d tree for clusters
     ec.set_SearchMethod(tree)
     # Extract indices for each of the discovered clusters
@@ -137,10 +134,10 @@ def clustering(objects):
     cluster_cloud = pcl.PointCloud_PointXYZRGB()
     cluster_cloud.from_list(color_cluster_point_list)
 
-    return cluster_cloud, cluster_indices
+    return white_cloud, cluster_cloud, cluster_indices
 
 
-def classify(cluster_indices):
+def classify(white_cloud, cloud_objects, cluster_indices):
     # Classify the clusters! (loop through each detected cluster one at a time)
     detected_objects_labels = []
     detected_objects = []
@@ -157,10 +154,13 @@ def classify(cluster_indices):
         chists = compute_color_histograms(ros_cluster, using_hsv=True)
         normals = get_normals(ros_cluster)
         nhists = compute_normal_histograms(normals)
+        if np.isnan(nhists).any():
+            continue
         feature = np.concatenate((chists, nhists))
 
         # Make the prediction, retrieve the label for the result
         # and add it to detected_objects_labels list
+
         prediction = clf.predict(scaler.transform(feature.reshape(1,-1)))
         label = encoder.inverse_transform(prediction)[0]
         detected_objects_labels.append(label)
@@ -184,9 +184,10 @@ def pcl_callback(pcl_msg):
 
     # TODO: Convert ROS msg to PCL data
     cloud = ros_to_pcl(pcl_msg)
-
     table, objects = segmentation(cloud)
-    cluster_cloud, cluster_indices = clustering(objects)
+
+    white_cloud, cluster_cloud, cluster_indices = clustering(objects)
+    rospy.loginfo('Clustered {} objects: {}'.format(len(cluster_indices), cluster_cloud))
     # TODO: Convert PCL data to ROS messages
     ros_objects = pcl_to_ros(objects)
     ros_table = pcl_to_ros(table)
@@ -197,7 +198,7 @@ def pcl_callback(pcl_msg):
     pcl_cluster_pub.publish(ros_cluster)
 
     # Exercise-3 TODOs:
-    detected_objects = classify(cluster_indices)
+    detected_objects = classify(white_cloud, objects, cluster_indices)
     
     # Publish the list of detected objects
     # This is the output you'll need to complete the upcoming project!

@@ -8,9 +8,9 @@ object_list:
       y: 0
       z: 0
     position:
-      x: 0
-      y: 0
-      z: 0
+      x: 0.5416222214698792
+      y: -0.2412417232990265
+      z: 0.7053096890449524
   place_pose:
     orientation:
       w: 0
@@ -31,9 +31,9 @@ object_list:
       y: 0
       z: 0
     position:
-      x: 0
-      y: 0
-      z: 0
+      x: 0.5446895360946655
+      y: -0.01852482371032238
+      z: 0.6767433285713196
   place_pose:
     orientation:
       w: 0
@@ -54,9 +54,9 @@ object_list:
       y: 0
       z: 0
     position:
-      x: 0
-      y: 0
-      z: 0
+      x: 0.44485512375831604
+      y: 0.22128501534461975
+      z: 0.6764971613883972
   place_pose:
     orientation:
       w: 0
