@@ -274,7 +274,7 @@ def pr2_mover(object_list):
             print "ERROR, group must be green or red!"
         # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
         test_scene_num = Int32()
-        test_scene_num.data = 3
+        test_scene_num.data = 1
 
         place_pose.position.x = dict_dropbox[arm_name.data][0]
         place_pose.position.y = dict_dropbox[arm_name.data][1]
