@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn import cross_validation
 from sklearn import metrics
 
+
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
@@ -35,6 +36,7 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
+
 # Load training data from disk
 training_set = pickle.load(open('training_set.sav', 'rb'))
 
@@ -48,7 +50,8 @@ for item in training_set:
         label_list.append(item[1])
 
 print('Features in Training Set: {}'.format(len(training_set)))
-print('Invalid Features in Training set: {}'.format(len(training_set)-len(feature_list)))
+print('Invalid Features in Training set: {}'.format(
+    len(training_set)-len(feature_list)))
 
 X = np.array(feature_list)
 # Fit a per-column scaler
@@ -72,20 +75,20 @@ kf = cross_validation.KFold(len(X_train),
 
 # Perform cross-validation
 scores = cross_validation.cross_val_score(cv=kf,
-                                         estimator=clf,
-                                         X=X_train, 
-                                         y=y_train,
-                                         scoring='accuracy'
-                                        )
+                                          estimator=clf,
+                                          X=X_train,
+                                          y=y_train,
+                                          scoring='accuracy'
+                                          )
 print('Scores: ' + str(scores))
 print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
 
 # Gather predictions
 predictions = cross_validation.cross_val_predict(cv=kf,
-                                          estimator=clf,
-                                          X=X_train, 
-                                          y=y_train
-                                         )
+                                                 estimator=clf,
+                                                 X=X_train,
+                                                 y=y_train
+                                                 )
 
 accuracy_score = metrics.accuracy_score(y_train, predictions)
 print('accuracy score: '+str(accuracy_score))
@@ -95,7 +98,7 @@ confusion_matrix = metrics.confusion_matrix(y_train, predictions)
 class_names = encoder.classes_.tolist()
 
 
-#Train the classifier
+# Train the classifier
 clf.fit(X=X_train, y=y_train)
 
 model = {'classifier': clf, 'classes': encoder.classes_, 'scaler': X_scaler}
