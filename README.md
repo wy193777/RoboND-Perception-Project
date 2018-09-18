@@ -10,7 +10,19 @@
 
 ### 1. Filtering and RANSAC plane fitting
 
+The purpose of this step is to seperate objects from the table. There are 4 steps to do it.
+
+#### Step 1: Voxel Grid Filter
+
+#### Step 2: Pass Through Filter
+
+#### Step 3: RANSAC Plane Segmentation
+
+#### Step 4: Extract Inliers
+
 Filtering and RANSAC plane fitting implemented inside the `segmentation` function in `project_template.py`, start from line 58.
+
+
 
 ### 2. Clustering for segmentation implemented
 
