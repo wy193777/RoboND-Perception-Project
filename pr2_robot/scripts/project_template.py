@@ -71,9 +71,8 @@ def segmentation(cloud):
     filter_parameters = [
         ('z', 0.6, 1.3),
         ('y', -0.5, 0.5),
-        #('x', 0.3, 1.0),
+        ('x', 0.3, 1.0),
     ]
-    passthrough = None
     for params in filter_parameters:
         # PassThrough Filter
         passthrough = cloud_filtered.make_passthrough_filter()
@@ -171,10 +170,10 @@ def classify(white_cloud, cloud_objects, cluster_indices):
         object_markers_pub.publish(make_label(label,label_pos, idx))
 
         # Add the detected object to the list of detected objects.
-        do = DetectedObject()
-        do.label = label
-        do.cloud = ros_cluster
-        detected_objects.append(do)
+        an_object = DetectedObject()
+        an_object.label = label
+        an_object.cloud = ros_cluster
+        detected_objects.append(an_object)
 
     rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
 

@@ -9,10 +9,11 @@ from sklearn import cross_validation
 from sklearn import metrics
 
 
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+def plot_confusion_matrix(
+        cm, classes,
+        normalize=False,
+        title='Confusion matrix',
+        cmap=plt.cm.Blues):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -28,9 +29,10 @@ def plot_confusion_matrix(cm, classes,
 
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, '{0:.2f}'.format(cm[i, j]),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+        plt.text(
+            j, i, '{0:.2f}'.format(cm[i, j]),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > thresh else "black")
 
     plt.tight_layout()
     plt.ylabel('True label')
@@ -68,27 +70,30 @@ y_train = encoder.fit_transform(y_train)
 clf = svm.SVC(kernel='linear')
 
 # Set up 5-fold cross-validation
-kf = cross_validation.KFold(len(X_train),
-                            n_folds=5,
-                            shuffle=True,
-                            random_state=1)
+kf = cross_validation.KFold(
+    len(X_train),
+    n_folds=5,
+    shuffle=True,
+    random_state=1)
 
 # Perform cross-validation
-scores = cross_validation.cross_val_score(cv=kf,
-                                          estimator=clf,
-                                          X=X_train,
-                                          y=y_train,
-                                          scoring='accuracy'
-                                          )
+scores = cross_validation.cross_val_score(
+    cv=kf,
+    estimator=clf,
+    X=X_train,
+    y=y_train,
+    scoring='accuracy'
+)
 print('Scores: ' + str(scores))
 print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
 
 # Gather predictions
-predictions = cross_validation.cross_val_predict(cv=kf,
-                                                 estimator=clf,
-                                                 X=X_train,
-                                                 y=y_train
-                                                 )
+predictions = cross_validation.cross_val_predict(
+    cv=kf,
+    estimator=clf,
+    X=X_train,
+    y=y_train
+)
 
 accuracy_score = metrics.accuracy_score(y_train, predictions)
 print('accuracy score: '+str(accuracy_score))
@@ -108,12 +113,14 @@ pickle.dump(model, open('model.sav', 'wb'))
 
 # Plot non-normalized confusion matrix
 plt.figure()
-plot_confusion_matrix(confusion_matrix, classes=encoder.classes_,
-                      title='Confusion matrix, without normalization')
+plot_confusion_matrix(
+    confusion_matrix, classes=encoder.classes_,
+    title='Confusion matrix, without normalization')
 
 # Plot normalized confusion matrix
 plt.figure()
-plot_confusion_matrix(confusion_matrix, classes=encoder.classes_, normalize=True,
-                      title='Normalized confusion matrix')
+plot_confusion_matrix(
+    confusion_matrix, classes=encoder.classes_, normalize=True,
+    title='Normalized confusion matrix')
 
 plt.show()

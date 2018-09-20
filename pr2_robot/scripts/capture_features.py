@@ -16,22 +16,23 @@ from sensor_msgs.msg import PointCloud2
 
 
 def get_normals(cloud):
-    get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
+    get_normals_prox = rospy.ServiceProxy(
+        '/feature_extractor/get_normals', GetNormals)
     return get_normals_prox(cloud).cluster
 
 
 if __name__ == '__main__':
     rospy.init_node('capture_node')
 
-    models = [\
-       'biscuits',
-       'soap',
-       'soap2',
-       'book',
-       'glue',
-       'sticky_notes',
-       'snacks',
-       'eraser']
+    models = [
+        'biscuits',
+        'soap',
+        'soap2',
+        'book',
+        'glue',
+        'sticky_notes',
+        'snacks',
+        'eraser']
 
     # Disable gravity and delete the ground plane
     initial_setup()
@@ -64,6 +65,4 @@ if __name__ == '__main__':
 
         delete_model()
 
-
     pickle.dump(labeled_features, open('training_set_1000.sav', 'wb'))
-
